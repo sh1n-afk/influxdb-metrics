@@ -1,18 +1,14 @@
 #!/bin/bash
 
-# Write data for NodeExpCPUMetrics
-influx write --bucket NodeExpCPUMetrics --org argusdb --precision ns -f ../data/NodeExpCPUMetrics.lp
+# Variables
+ORG_NAME="argusdb"
+DATA_DIR="data"
 
-# Write data for NodeExpMemoryMetrics
-influx write --bucket NodeExpMemoryMetrics --org argusdb --precision ns -f ../data/NodeExpMemoryMetrics.lp
-
-# Write data for NodeExpNetworkMetric
-influx write --bucket NodeExpNetworkMetric --org argusdb --precision ns -f ../data/NodeExpNetworkMetric.lp
-
-# Write data for NodeExpDiskStats
-influx write --bucket NodeExpDiskStats --org argusdb --precision ns -f ../data/NodeExpDiskStats.lp
-
-# Write data for FaultDetailStructure
-influx write --bucket FaultDetailStructure --org argusdb --precision ns -f ../data/FaultDetailStructure.lp
+# Write data for each .lp file in the data directory
+for FILE in "$DATA_DIR"/*.lp; do
+  BUCKET=$(basename "$FILE" .lp)
+  echo "Writing data to bucket: $BUCKET..."
+  influx write --bucket "$BUCKET" --org "$ORG_NAME" --precision ns -f "$FILE" || echo "Error writing to bucket: $BUCKET"
+done
 
 echo "Data written successfully to all buckets."
